@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incident Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a18;min-height:100vh}
+.topbar{background:#fff;border-bottom:1px solid #e5e4e0;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-left h1{font-size:16px;font-weight:600;letter-spacing:-.3px}
+.topbar-left .sub{font-size:12px;color:#888;margin-left:4px}
+.nav{display:flex;gap:4px}
+.nav button{padding:6px 14px;font-size:13px;border:1px solid #e5e4e0;border-radius:8px;background:#fff;color:#666;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.nav button svg{width:14px;height:14px;opacity:.7}
+.nav button.active,.nav button:hover{background:#1a1a18;color:#fff;border-color:#1a1a18}
+.nav button.active svg,.nav button:hover svg{opacity:1}
+.main{max-width:940px;margin:0 auto;padding:1.5rem 1rem}
+.btn{padding:8px 16px;font-size:13px;border-radius:8px;cursor:pointer;border:1px solid #e5e4e0;background:#fff;color:#1a1a18;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:#f5f4f0}
+.btn-primary{background:#1a1a18;color:#fff;border-color:#1a1a18}
+.btn-primary:hover{background:#333}
+.btn-danger{background:#fff;color:#c0392b;border-color:#f5c6c6}
+.btn-danger:hover{background:#fff5f5}
+.card{background:#fff;border:1px solid #e5e4e0;border-radius:12px;padding:1.25rem}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.25rem}
+.metric{background:#fff;border:1px solid #e5e4e0;border-radius:10px;padding:1rem;text-align:center}
+.metric .val{font-size:28px;font-weight:600;line-height:1.1;letter-spacing:-1px}
+.metric .lbl{font-size:11px;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.metric .val.red{color:#c0392b}.metric .val.amber{color:#b8640a}.metric .val.green{color:#1a6b3c}.metric .val.blue{color:#1a5fa5}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem}
+.chart-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:.75rem}
+.bar-item{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:13px}
+.bar-wrap{flex:1;background:#f5f4f0;border-radius:3px;height:10px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.bar-label{min-width:90px;color:#666;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-count{min-width:18px;text-align:right;font-weight:600;font-size:12px}
+.incidents-list{display:flex;flex-direction:column;gap:6px}
+.incident-row{background:#fff;border:1px solid #e5e4e0;border-radius:10px;padding:.9rem 1rem;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:12px}
+.incident-row:hover{border-color:#1a1a18;transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.badge{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600;white-space:nowrap;letter-spacing:.2px}
+.badge-Open{background:#fef2f2;color:#991b1b}
+.badge-In.Progress,.badge-In-Progress{background:#fef9ee;color:#92400e}
+.badge-Resolved{background:#f0fdf4;color:#166534}
+.badge-Low{background:#f0fdf4;color:#166534}
+.badge-Medium{background:#fef9ee;color:#92400e}
+.badge-High{background:#fff7ed;color:#c2410c}
+.badge-Critical{background:#fef2f2;color:#991b1b}
+.inc-info{flex:1;min-width:0}
+.inc-title{font-size:14px;font-weight:500;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inc-meta{font-size:12px;color:#888;display:flex;gap:10px;flex-wrap:wrap}
+.inc-badges{display:flex;gap:5px;flex-shrink:0;align-items:flex-start;flex-wrap:wrap;justify-content:flex-end;max-width:160px}
+form label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;color:#888}
+form input,form select,form textarea{width:100%;padding:9px 12px;font-size:14px;border:1px solid #e5e4e0;border-radius:8px;background:#fff;color:#1a1a18;font-family:inherit;transition:border .15s}
+form input:focus,form select:focus,form textarea:focus{outline:none;border-color:#1a1a18}
+form textarea{resize:vertical;min-height:90px;line-height:1.5}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-group{margin-bottom:1rem}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:.5rem;padding-top:1rem;border-top:1px solid #f0efe8}
+.detail-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;gap:1rem;flex-wrap:wrap}
+.divider{border:none;border-top:1px solid #f0efe8;margin:1rem 0}
+.detail-field .field-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;font-weight:600}
+.detail-field .field-value{font-size:14px;line-height:1.6}
+.empty{text-align:center;padding:3rem 1rem;color:#aaa;font-size:14px}
+.filter-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.filter-row select{padding:6px 10px;font-size:13px;border:1px solid #e5e4e0;border-radius:8px;background:#fff;color:#444}
+.loading{text-align:center;padding:3rem;color:#aaa;font-size:14px}
+.spinner{width:20px;height:20px;border:2px solid #e5e4e0;border-top-color:#1a1a18;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:-4px;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1a1a18;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:9999;animation:slideup .2s ease;pointer-events:none;max-width:300px}
+@keyframes slideup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.err{color:#c0392b;font-size:12px;margin-top:4px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.section-header h2{font-size:14px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px}
+@media(max-width:620px){.form-grid{grid-template-columns:1fr}.chart-row{grid-template-columns:1fr}.inc-badges{display:none}.topbar-left .sub{display:none}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+    <h1>Incident Tracker</h1>
+    <span class="sub">Manufacturing & Fulfillment</span>
+  </div>
+  <div class="nav">
+    <button id="tab-dash" class="active" onclick="showTab('dash')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+    <button id="tab-list" onclick="showTab('list')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Incidents
+    </button>
+    <button id="tab-new" onclick="showTab('new')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Report
+    </button>
+  </div>
+</div>
+
+<div class="main" id="content">
+  <div class="loading"><span class="spinner"></span>Connecting to database...</div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://qxnpxdpadewvatytczsk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_NSabPLAS-pUEgKsfo-lYqw_q_8rEyBS';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const TYPES = ['Injury','Near Miss','Equipment Failure','Quality Issue','Environmental','Other'];
+const DEPTS = ['Warehouse','Production','Shipping','QA','Maintenance','Office'];
+const SEVERITIES = ['Low','Medium','High','Critical'];
+const STATUSES = ['Open','In Progress','Resolved'];
+const TYPE_COLORS = ['#e24b4a','#ef9f27','#378add','#1d9e75','#7f77dd','#888780'];
+const DEPT_COLORS = ['#1d9e75','#378add','#ef9f27','#7f77dd','#d85a30','#888780'];
+
+let db = [];
+let currentTab = 'dash';
+let editingId = null;
+let filters = {status:'',type:'',department:'',severity:''};
+let toastTimer = null;
+
+async function loadData() {
+  const { data, error } = await sb.from('incidents').select('*').order('created_at', { ascending: false });
+  if (error) { showToast('Error loading data: ' + error.message); return; }
+  db = data || [];
+}
+
+async function init() {
+  await loadData();
+  showTab('dash');
+}
+
+function showTab(tab) {
+  currentTab = tab;
+  editingId = null;
+  ['dash','list','new'].forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (el) el.classList.toggle('active', t === tab);
+  });
+  render();
+}
+
+function render() {
+  const el = document.getElementById('content');
+  if (currentTab === 'dash') el.innerHTML = renderDash();
+  else if (currentTab === 'list') el.innerHTML = renderList();
+  else if (currentTab === 'new') el.innerHTML = renderForm();
+  else if (currentTab === 'detail') el.innerHTML = renderDetail();
+}
+
+function statusBadge(s) {
+  const key = s.replace(' ','-');
+  return `<span class="badge badge-${key}" style="background:${s==='Open'?'#fef2f2':s==='In Progress'?'#fef9ee':'#f0fdf4'};color:${s==='Open'?'#991b1b':s==='In Progress'?'#92400e':'#166534'}">${s}</span>`;
+}
+function sevBadge(s) {
+  const colors = {Low:['#f0fdf4','#166534'],Medium:['#fef9ee','#92400e'],High:['#fff7ed','#c2410c'],Critical:['#fef2f2','#991b1b']};
+  const c = colors[s] || ['#f5f4f0','#444'];
+  return `<span class="badge" style="background:${c[0]};color:${c[1]}">${s}</span>`;
+}
+
+function avgResolutionDays() {
+  const resolved = db.filter(i => i.resolved_at);
+  if (!resolved.length) return null;
+  const avg = resolved.reduce((a, i) => a + (new Date(i.resolved_at) - new Date(i.created_at)), 0) / resolved.length;
+  return Math.round(avg / 86400000 * 10) / 10;
+}
+
+function renderDash() {
+  const open = db.filter(i => i.status === 'Open').length;
+  const inprog = db.filter(i => i.status === 'In Progress').length;
+  const resolved = db.filter(i => i.status === 'Resolved').length;
+  const critical = db.filter(i => i.severity === 'Critical' && i.status !== 'Resolved').length;
+  const avg = avgResolutionDays();
+
+  const byType = TYPES.map((t,i) => ({name:t,count:db.filter(x=>x.type===t).length,color:TYPE_COLORS[i]})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
+  const byDept = DEPTS.map((d,i) => ({name:d,count:db.filter(x=>x.department===d).length,color:DEPT_COLORS[i]})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
+  const maxType = byType[0]?.count || 1;
+  const maxDept = byDept[0]?.count || 1;
+  const recent = db.slice(0, 5);
+
+  return `
+<div class="metric-grid">
+  <div class="metric"><div class="val red">${open}</div><div class="lbl">Open</div></div>
+  <div class="metric"><div class="val amber">${inprog}</div><div class="lbl">In Progress</div></div>
+  <div class="metric"><div class="val green">${resolved}</div><div class="lbl">Resolved</div></div>
+  <div class="metric"><div class="val ${critical>0?'red':'green'}">${critical}</div><div class="lbl">Critical Open</div></div>
+  <div class="metric"><div class="val blue">${avg !== null ? avg + 'd' : '—'}</div><div class="lbl">Avg Resolution</div></div>
+</div>
+
+<div class="chart-row">
+  <div class="card">
+    <div class="chart-title">By Incident Type</div>
+    ${byType.length ? byType.map(x=>`
+    <div class="bar-item">
+      <span class="bar-label">${x.name}</span>
+      <div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(x.count/maxType*100)}%;background:${x.color}"></div></div>
+      <span class="bar-count">${x.count}</span>
+    </div>`).join('') : '<div style="color:#aaa;font-size:13px;padding:.5rem 0">No data yet</div>'}
+  </div>
+  <div class="card">
+    <div class="chart-title">By Department</div>
+    ${byDept.length ? byDept.map(x=>`
+    <div class="bar-item">
+      <span class="bar-label">${x.name}</span>
+      <div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(x.count/maxDept*100)}%;background:${x.color}"></div></div>
+      <span class="bar-count">${x.count}</span>
+    </div>`).join('') : '<div style="color:#aaa;font-size:13px;padding:.5rem 0">No data yet</div>'}
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-header">
+    <h2>Recent Incidents</h2>
+    <button class="btn" onclick="showTab('list')" style="font-size:12px;padding:5px 10px">View all →</button>
+  </div>
+  ${recent.length ? `<div class="incidents-list">${recent.map(i=>`
+  <div class="incident-row" onclick="openDetail(${i.id})">
+    <div class="inc-info">
+      <div class="inc-title">${esc(i.title)}</div>
+      <div class="inc-meta"><span>${i.department}</span><span>${i.type}</span><span>${fmtDate(i.created_at)}</span><span>by ${esc(i.reported_by)}</span></div>
+    </div>
+    <div class="inc-badges">${statusBadge(i.status)}${sevBadge(i.severity)}</div>
+  </div>`).join('')}</div>` : '<div class="empty">No incidents reported yet.</div>'}
+</div>`;
+}
+
+function renderList() {
+  const filtered = getFiltered();
+  const sorted = filtered.slice().sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  return `
+<div class="filter-row">
+  <select onchange="applyFilter(this,'status')">
+    <option value="">All statuses</option>
+    ${STATUSES.map(s=>`<option value="${s}" ${filters.status===s?'selected':''}>${s}</option>`).join('')}
+  </select>
+  <select onchange="applyFilter(this,'type')">
+    <option value="">All types</option>
+    ${TYPES.map(t=>`<option value="${t}" ${filters.type===t?'selected':''}>${t}</option>`).join('')}
+  </select>
+  <select onchange="applyFilter(this,'department')">
+    <option value="">All departments</option>
+    ${DEPTS.map(d=>`<option value="${d}" ${filters.department===d?'selected':''}>${d}</option>`).join('')}
+  </select>
+  <select onchange="applyFilter(this,'severity')">
+    <option value="">All severities</option>
+    ${SEVERITIES.map(s=>`<option value="${s}" ${filters.severity===s?'selected':''}>${s}</option>`).join('')}
+  </select>
+  <span style="font-size:13px;color:#888;align-self:center;margin-left:4px">${filtered.length} incident${filtered.length!==1?'s':''}</span>
+</div>
+<div class="incidents-list">
+${sorted.length ? sorted.map(i=>`
+<div class="incident-row" onclick="openDetail(${i.id})">
+  <div class="inc-info">
+    <div class="inc-title">${esc(i.title)}</div>
+    <div class="inc-meta">
+      <span>${i.department}</span>
+      <span>${i.type}</span>
+      <span>by ${esc(i.reported_by)}</span>
+      <span>${fmtDate(i.created_at)}</span>
+    </div>
+  </div>
+  <div class="inc-badges">${statusBadge(i.status)}${sevBadge(i.severity)}</div>
+</div>`).join('') : '<div class="empty">No incidents match your filters.</div>'}
+</div>`;
+}
+
+function applyFilter(el, key) { filters[key] = el.value; render(); }
+function getFiltered() {
+  return db.filter(i =>
+    (!filters.status || i.status === filters.status) &&
+    (!filters.type || i.type === filters.type) &&
+    (!filters.department || i.department === filters.department) &&
+    (!filters.severity || i.severity === filters.severity)
+  );
+}
+
+function renderForm() {
+  return `
+<div class="card">
+  <div style="font-size:15px;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+    Report New Incident
+  </div>
+  <div class="form-group">
+    <label>Incident title *</label>
+    <input id="f-title" type="text" placeholder="Brief description of what happened">
+    <div class="err" id="err-title"></div>
+  </div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>Incident type *</label>
+      <select id="f-type"><option value="">Select type</option>${TYPES.map(t=>`<option>${t}</option>`).join('')}</select>
+    </div>
+    <div class="form-group">
+      <label>Department *</label>
+      <select id="f-dept"><option value="">Select department</option>${DEPTS.map(d=>`<option>${d}</option>`).join('')}</select>
+    </div>
+    <div class="form-group">
+      <label>Severity *</label>
+      <select id="f-sev"><option value="">Select severity</option>${SEVERITIES.map(s=>`<option>${s}</option>`).join('')}</select>
+    </div>
+    <div class="form-group">
+      <label>Reported by *</label>
+      <input id="f-reporter" type="text" placeholder="Your full name">
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Full description *</label>
+    <textarea id="f-desc" placeholder="Describe what happened, where, any immediate actions taken, witnesses, etc."></textarea>
+  </div>
+  <div class="form-actions">
+    <button class="btn" onclick="showTab('list')">Cancel</button>
+    <button class="btn btn-primary" onclick="submitForm()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Submit Incident
+    </button>
+  </div>
+</div>`;
+}
+
+async function submitForm() {
+  const title = document.getElementById('f-title').value.trim();
+  const type = document.getElementById('f-type').value;
+  const dept = document.getElementById('f-dept').value;
+  const sev = document.getElementById('f-sev').value;
+  const reporter = document.getElementById('f-reporter').value.trim();
+  const desc = document.getElementById('f-desc').value.trim();
+
+  document.getElementById('err-title').textContent = '';
+  if (!title) { document.getElementById('err-title').textContent = 'Title is required'; return; }
+  if (!type || !dept || !sev || !reporter || !desc) { showToast('Please fill in all required fields.'); return; }
+
+  const btn = document.querySelector('[onclick="submitForm()"]');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+
+  const { data, error } = await sb.from('incidents').insert([{
+    title, type, department: dept, severity: sev,
+    reported_by: reporter, description: desc,
+    status: 'Open', corrective_action: ''
+  }]).select().single();
+
+  btn.disabled = false;
+  if (error) { showToast('Error: ' + error.message); btn.innerHTML = 'Submit Incident'; return; }
+
+  db.unshift(data);
+  showToast('Incident reported successfully.');
+  openDetail(data.id);
+}
+
+function openDetail(id) {
+  currentTab = 'detail';
+  editingId = id;
+  ['dash','list','new'].forEach(t => { const el=document.getElementById('tab-'+t); if(el) el.classList.remove('active'); });
+  render();
+}
+
+function renderDetail() {
+  const inc = db.find(i => i.id === editingId);
+  if (!inc) return '<div class="empty">Incident not found.</div>';
+  const resTime = inc.resolved_at ? Math.round((new Date(inc.resolved_at) - new Date(inc.created_at)) / 86400000 * 10) / 10 : null;
+  return `
+<div style="margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
+  <button class="btn" onclick="showTab('list')" style="font-size:12px;padding:5px 12px">← Back to list</button>
+  <span style="font-size:12px;color:#aaa">Incident #${inc.id}</span>
+</div>
+<div class="card">
+  <div class="detail-header">
+    <div style="flex:1">
+      <div style="font-size:17px;font-weight:600;margin-bottom:8px;line-height:1.3">${esc(inc.title)}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${statusBadge(inc.status)}${sevBadge(inc.severity)}</div>
+    </div>
+    <div style="font-size:12px;color:#aaa;text-align:right;flex-shrink:0">
+      <div>Reported ${fmtDate(inc.created_at)}</div>
+      ${inc.resolved_at ? `<div>Resolved ${fmtDate(inc.resolved_at)}</div><div style="color:#1a6b3c;font-weight:600">${resTime}d to resolve</div>` : ''}
+    </div>
+  </div>
+  <hr class="divider">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.25rem">
+    <div class="detail-field"><div class="field-label">Type</div><div class="field-value">${inc.type}</div></div>
+    <div class="detail-field"><div class="field-label">Department</div><div class="field-value">${inc.department}</div></div>
+    <div class="detail-field"><div class="field-label">Reported by</div><div class="field-value">${esc(inc.reported_by)}</div></div>
+  </div>
+  <div class="detail-field" style="margin-bottom:1.25rem">
+    <div class="field-label">Description</div>
+    <div class="field-value" style="background:#f9f8f5;border-radius:8px;padding:.75rem 1rem;line-height:1.7;font-size:14px">${esc(inc.description)}</div>
+  </div>
+  ${inc.corrective_action ? `
+  <div class="detail-field" style="margin-bottom:1.25rem">
+    <div class="field-label">Corrective action taken</div>
+    <div class="field-value" style="background:#f0fdf4;border-radius:8px;padding:.75rem 1rem;line-height:1.7;font-size:14px;border-left:3px solid #1a6b3c">${esc(inc.corrective_action)}</div>
+  </div>` : ''}
+  <hr class="divider">
+  <div style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:#888;margin-bottom:1rem">Update Incident</div>
+  <div class="form-grid" style="margin-bottom:1rem">
+    <div class="form-group" style="margin-bottom:0">
+      <label>Status</label>
+      <select id="u-status">${STATUSES.map(s=>`<option value="${s}" ${inc.status===s?'selected':''}>${s}</option>`).join('')}</select>
+    </div>
+    <div style="display:flex;align-items:flex-end;padding-bottom:.5rem">
+      <p style="font-size:12px;color:#aaa;line-height:1.6">Setting to <strong style="color:#444">Resolved</strong> records the resolution date and updates avg. resolution time.</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Corrective action</label>
+    <textarea id="u-action" placeholder="Describe corrective actions taken or planned...">${esc(inc.corrective_action || '')}</textarea>
+  </div>
+  <div class="form-actions">
+    <button class="btn btn-danger" onclick="deleteIncident(${inc.id})" style="margin-right:auto">Delete</button>
+    <button class="btn" onclick="showTab('list')">Cancel</button>
+    <button class="btn btn-primary" id="save-btn" onclick="updateIncident()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Save Changes
+    </button>
+  </div>
+</div>`;
+}
+
+async function updateIncident() {
+  const inc = db.find(i => i.id === editingId);
+  if (!inc) return;
+  const newStatus = document.getElementById('u-status').value;
+  const action = document.getElementById('u-action').value;
+  const wasResolved = inc.status === 'Resolved';
+  const nowResolved = newStatus === 'Resolved';
+
+  const updates = {
+    status: newStatus,
+    corrective_action: action,
+    resolved_at: nowResolved && !wasResolved ? new Date().toISOString() : (!nowResolved ? null : inc.resolved_at)
+  };
+
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  const { error } = await sb.from('incidents').update(updates).eq('id', editingId);
+  btn.disabled = false;
+  if (error) { showToast('Error: ' + error.message); return; }
+
+  Object.assign(inc, updates);
+  showToast('Incident updated successfully.');
+  render();
+}
+
+async function deleteIncident(id) {
+  if (!confirm('Delete this incident? This cannot be undone.')) return;
+  const { error } = await sb.from('incidents').delete().eq('id', id);
+  if (error) { showToast('Error: ' + error.message); return; }
+  db = db.filter(i => i.id !== id);
+  showToast('Incident deleted.');
+  showTab('list');
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
+}
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg) {
+  const old = document.getElementById('toast-el');
+  if (old) old.remove();
+  if (toastTimer) clearTimeout(toastTimer);
+  const t = document.createElement('div');
+  t.className = 'toast'; t.id = 'toast-el'; t.textContent = msg;
+  document.body.appendChild(t);
+  toastTimer = setTimeout(() => t.remove(), 3000);
+}
+
+init();
+</script>
+</body>
+</html>
