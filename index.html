@@ -24,6 +24,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-primary:hover{background:#333}
 .btn-danger{background:#fff;color:#c0392b;border-color:#f5c6c6}
 .btn-danger:hover{background:#fff5f5}
+.btn-sm{padding:5px 10px;font-size:12px}
 .card{background:#fff;border:1px solid #e5e4e0;border-radius:12px;padding:1.25rem}
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.25rem}
 .metric{background:#fff;border:1px solid #e5e4e0;border-radius:10px;padding:1rem;text-align:center}
@@ -48,7 +49,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 form label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;color:#888}
 form input,form select,form textarea{width:100%;padding:9px 12px;font-size:14px;border:1px solid #e5e4e0;border-radius:8px;background:#fff;color:#1a1a18;font-family:inherit;transition:border .15s}
 form input:focus,form select:focus,form textarea:focus{outline:none;border-color:#1a1a18}
-form textarea{resize:vertical;min-height:90px;line-height:1.5}
+form textarea{resize:vertical;min-height:80px;line-height:1.5}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .form-group{margin-bottom:1rem}
 .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:.5rem;padding-top:1rem;border-top:1px solid #f0efe8}
@@ -68,29 +69,47 @@ form textarea{resize:vertical;min-height:90px;line-height:1.5}
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
 .section-header h2{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px}
 
-/* Photo upload zone */
-.photo-upload-zone{border:2px dashed #e5e4e0;border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .15s;background:#fafaf8;position:relative}
+/* Photo upload */
+.photo-upload-zone{border:2px dashed #e5e4e0;border-radius:10px;padding:1.25rem;text-align:center;cursor:pointer;transition:all .15s;background:#fafaf8;position:relative}
 .photo-upload-zone:hover,.photo-upload-zone.dragover{border-color:#1a1a18;background:#f5f4f0}
 .photo-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.photo-upload-zone .upload-icon{font-size:28px;margin-bottom:6px}
+.photo-upload-zone .upload-icon{font-size:24px;margin-bottom:4px}
 .photo-upload-zone p{font-size:13px;color:#888;margin:0}
 .photo-upload-zone p strong{color:#1a1a18}
-.photo-previews{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px}
+.photo-previews{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:10px}
 .photo-preview-wrap{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid #e5e4e0}
 .photo-preview-wrap img{width:100%;height:100%;object-fit:cover}
-.photo-preview-wrap .remove-photo{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;line-height:1}
+.photo-preview-wrap .remove-photo{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
 .photo-preview-wrap .remove-photo:hover{background:rgba(200,0,0,.8)}
-
-/* Photo gallery in detail */
-.photo-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:8px}
+.photo-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:8px}
 .photo-gallery a{display:block;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid #e5e4e0;transition:transform .15s}
 .photo-gallery a:hover{transform:scale(1.03)}
 .photo-gallery img{width:100%;height:100%;object-fit:cover}
 
-/* Upload progress */
-.upload-progress{background:#f0efe8;border-radius:8px;padding:.75rem 1rem;font-size:13px;color:#666;display:flex;align-items:center;gap:8px;margin-top:8px}
+/* Involved people */
+.involved-list{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+.involved-card{background:#f9f8f5;border:1px solid #e5e4e0;border-radius:10px;padding:1rem;position:relative}
+.involved-card .remove-involved{position:absolute;top:8px;right:8px;background:none;border:none;color:#aaa;cursor:pointer;font-size:16px;line-height:1;padding:2px 6px;border-radius:4px}
+.involved-card .remove-involved:hover{color:#c0392b;background:#fff0f0}
+.involved-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.involved-grid input,.involved-grid select{padding:7px 10px;font-size:13px}
+.involved-card textarea{font-size:13px;min-height:60px;padding:7px 10px}
+.add-involved-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;font-size:13px;border:1px dashed #c0bfba;border-radius:8px;background:transparent;color:#888;cursor:pointer;transition:all .15s;width:100%;justify-content:center}
+.add-involved-btn:hover{border-color:#1a1a18;color:#1a1a18;background:#f5f4f0}
 
-@media(max-width:620px){.form-grid{grid-template-columns:1fr}.chart-row{grid-template-columns:1fr}.inc-badges{display:none}.topbar-left .sub{display:none}}
+/* Involved detail view */
+.involved-detail-card{background:#f9f8f5;border:1px solid #e5e4e0;border-radius:10px;padding:.9rem 1rem;margin-bottom:8px}
+.involved-detail-card .name-role{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.involved-detail-card .iname{font-size:14px;font-weight:600}
+.involved-detail-card .irole{font-size:12px;color:#888}
+.involved-detail-card .ilevel{font-size:11px;padding:2px 8px;border-radius:5px;font-weight:600}
+.ilevel-Direct{background:#fef2f2;color:#991b1b}
+.ilevel-Indirect{background:#fef9ee;color:#92400e}
+.ilevel-Witness{background:#eff6ff;color:#1e40af}
+.ilevel-Supervisor{background:#f5f3ff;color:#5b21b6}
+.involved-detail-card .idesc{font-size:13px;color:#555;line-height:1.6;margin-top:4px}
+
+@media(max-width:620px){.form-grid{grid-template-columns:1fr}.chart-row{grid-template-columns:1fr}.inc-badges{display:none}.topbar-left .sub{display:none}.involved-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -132,6 +151,7 @@ const TYPES = ['Injury','Near Miss','Equipment Failure','Quality Issue','Environ
 const DEPTS = ['Warehouse','Production','Shipping','QA','Maintenance','Office'];
 const SEVERITIES = ['Low','Medium','High','Critical'];
 const STATUSES = ['Open','In Progress','Resolved'];
+const INVOLVEMENT_LEVELS = ['Direct','Indirect','Witness','Supervisor'];
 const TYPE_COLORS = ['#e24b4a','#ef9f27','#378add','#1d9e75','#7f77dd','#888780'];
 const DEPT_COLORS = ['#1d9e75','#378add','#ef9f27','#7f77dd','#d85a30','#888780'];
 
@@ -141,6 +161,7 @@ let editingId = null;
 let filters = {status:'',type:'',department:'',severity:''};
 let toastTimer = null;
 let pendingFiles = [];
+let involvedPeople = []; // [{name, role, level, description}]
 
 async function loadData() {
   const { data, error } = await sb.from('incidents').select('*').order('created_at', { ascending: false });
@@ -148,59 +169,50 @@ async function loadData() {
   db = data || [];
 }
 
-async function init() {
-  await loadData();
-  showTab('dash');
-}
+async function init() { await loadData(); showTab('dash'); }
 
 function showTab(tab) {
-  currentTab = tab;
-  editingId = null;
-  pendingFiles = [];
-  ['dash','list','new'].forEach(t => {
-    const el = document.getElementById('tab-' + t);
-    if (el) el.classList.toggle('active', t === tab);
-  });
+  currentTab = tab; editingId = null; pendingFiles = []; involvedPeople = [];
+  ['dash','list','new'].forEach(t => { const el=document.getElementById('tab-'+t); if(el) el.classList.toggle('active',t===tab); });
   render();
 }
 
 function render() {
   const el = document.getElementById('content');
-  if (currentTab === 'dash') el.innerHTML = renderDash();
-  else if (currentTab === 'list') el.innerHTML = renderList();
-  else if (currentTab === 'new') el.innerHTML = renderForm();
-  else if (currentTab === 'detail') el.innerHTML = renderDetail();
+  if (currentTab==='dash') el.innerHTML = renderDash();
+  else if (currentTab==='list') el.innerHTML = renderList();
+  else if (currentTab==='new') el.innerHTML = renderForm();
+  else if (currentTab==='detail') el.innerHTML = renderDetail();
 }
 
 function statusBadge(s) {
-  const bg = s==='Open'?'#fef2f2':s==='In Progress'?'#fef9ee':'#f0fdf4';
-  const color = s==='Open'?'#991b1b':s==='In Progress'?'#92400e':'#166534';
+  const bg=s==='Open'?'#fef2f2':s==='In Progress'?'#fef9ee':'#f0fdf4';
+  const color=s==='Open'?'#991b1b':s==='In Progress'?'#92400e':'#166534';
   return `<span class="badge" style="background:${bg};color:${color}">${s}</span>`;
 }
 function sevBadge(s) {
-  const m = {Low:['#f0fdf4','#166534'],Medium:['#fef9ee','#92400e'],High:['#fff7ed','#c2410c'],Critical:['#fef2f2','#991b1b']};
-  const c = m[s]||['#f5f4f0','#444'];
+  const m={Low:['#f0fdf4','#166534'],Medium:['#fef9ee','#92400e'],High:['#fff7ed','#c2410c'],Critical:['#fef2f2','#991b1b']};
+  const c=m[s]||['#f5f4f0','#444'];
   return `<span class="badge" style="background:${c[0]};color:${c[1]}">${s}</span>`;
 }
 
 function avgResolutionDays() {
-  const resolved = db.filter(i => i.resolved_at);
-  if (!resolved.length) return null;
-  const avg = resolved.reduce((a,i) => a+(new Date(i.resolved_at)-new Date(i.created_at)),0)/resolved.length;
+  const resolved=db.filter(i=>i.resolved_at);
+  if(!resolved.length)return null;
+  const avg=resolved.reduce((a,i)=>a+(new Date(i.resolved_at)-new Date(i.created_at)),0)/resolved.length;
   return Math.round(avg/86400000*10)/10;
 }
 
 function renderDash() {
-  const open = db.filter(i=>i.status==='Open').length;
-  const inprog = db.filter(i=>i.status==='In Progress').length;
-  const resolved = db.filter(i=>i.status==='Resolved').length;
-  const critical = db.filter(i=>i.severity==='Critical'&&i.status!=='Resolved').length;
-  const avg = avgResolutionDays();
-  const byType = TYPES.map((t,i)=>({name:t,count:db.filter(x=>x.type===t).length,color:TYPE_COLORS[i]})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
-  const byDept = DEPTS.map((d,i)=>({name:d,count:db.filter(x=>x.department===d).length,color:DEPT_COLORS[i]})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
-  const maxType = byType[0]?.count||1;
-  const maxDept = byDept[0]?.count||1;
-  const recent = db.slice(0,5);
+  const open=db.filter(i=>i.status==='Open').length;
+  const inprog=db.filter(i=>i.status==='In Progress').length;
+  const resolved=db.filter(i=>i.status==='Resolved').length;
+  const critical=db.filter(i=>i.severity==='Critical'&&i.status!=='Resolved').length;
+  const avg=avgResolutionDays();
+  const byType=TYPES.map((t,i)=>({name:t,count:db.filter(x=>x.type===t).length,color:TYPE_COLORS[i]})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
+  const byDept=DEPTS.map((d,i)=>({name:d,count:db.filter(x=>x.department===d).length,color:DEPT_COLORS[i]})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
+  const maxType=byType[0]?.count||1, maxDept=byDept[0]?.count||1;
+  const recent=db.slice(0,5);
   return `
 <div class="metric-grid">
   <div class="metric"><div class="val red">${open}</div><div class="lbl">Open</div></div>
@@ -228,7 +240,11 @@ function renderDash() {
   <div class="incident-row" onclick="openDetail(${i.id})">
     <div class="inc-info">
       <div class="inc-title">${esc(i.title)}</div>
-      <div class="inc-meta"><span>${i.department}</span><span>${i.type}</span><span>${fmtDate(i.created_at)}</span><span>by ${esc(i.reported_by)}</span>${i.photos&&i.photos.length?`<span>📷 ${i.photos.length} photo${i.photos.length>1?'s':''}</span>`:''}</div>
+      <div class="inc-meta">
+        <span>${i.department}</span><span>${i.type}</span><span>${fmtDate(i.created_at)}</span><span>by ${esc(i.reported_by)}</span>
+        ${i.involved&&i.involved.length?`<span>👥 ${i.involved.length} involved</span>`:''}
+        ${i.photos&&i.photos.length?`<span>📷 ${i.photos.length} photo${i.photos.length>1?'s':''}</span>`:''}
+      </div>
     </div>
     <div class="inc-badges">${statusBadge(i.status)}${sevBadge(i.severity)}</div>
   </div>`).join('')}</div>`:'<div class="empty">No incidents reported yet.</div>'}
@@ -236,8 +252,8 @@ function renderDash() {
 }
 
 function renderList() {
-  const filtered = getFiltered();
-  const sorted = filtered.slice().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  const filtered=getFiltered();
+  const sorted=filtered.slice().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
   return `
 <div class="filter-row">
   <select onchange="applyFilter(this,'status')"><option value="">All statuses</option>${STATUSES.map(s=>`<option value="${s}" ${filters.status===s?'selected':''}>${s}</option>`).join('')}</select>
@@ -251,7 +267,11 @@ ${sorted.length?sorted.map(i=>`
 <div class="incident-row" onclick="openDetail(${i.id})">
   <div class="inc-info">
     <div class="inc-title">${esc(i.title)}</div>
-    <div class="inc-meta"><span>${i.department}</span><span>${i.type}</span><span>by ${esc(i.reported_by)}</span><span>${fmtDate(i.created_at)}</span>${i.photos&&i.photos.length?`<span>📷 ${i.photos.length} photo${i.photos.length>1?'s':''}</span>`:''}</div>
+    <div class="inc-meta">
+      <span>${i.department}</span><span>${i.type}</span><span>by ${esc(i.reported_by)}</span><span>${fmtDate(i.created_at)}</span>
+      ${i.involved&&i.involved.length?`<span>👥 ${i.involved.length} involved</span>`:''}
+      ${i.photos&&i.photos.length?`<span>📷 ${i.photos.length} photo${i.photos.length>1?'s':''}</span>`:''}
+    </div>
   </div>
   <div class="inc-badges">${statusBadge(i.status)}${sevBadge(i.severity)}</div>
 </div>`).join(''):'<div class="empty">No incidents match your filters.</div>'}
@@ -263,13 +283,74 @@ function getFiltered(){
   return db.filter(i=>(!filters.status||i.status===filters.status)&&(!filters.type||i.type===filters.type)&&(!filters.department||i.department===filters.department)&&(!filters.severity||i.severity===filters.severity));
 }
 
+// ── Involved people helpers ──────────────────────────────
+function renderInvolvedEditor(people) {
+  return `
+<div class="involved-list" id="involved-list">
+  ${people.map((p,i)=>renderInvolvedRow(p,i)).join('')}
+</div>
+<button type="button" class="add-involved-btn" onclick="addInvolvedRow()">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  Add person
+</button>`;
+}
+
+function renderInvolvedRow(p, i) {
+  return `
+<div class="involved-card" id="inv-card-${i}">
+  <button type="button" class="remove-involved" onclick="removeInvolvedRow(${i})">✕</button>
+  <div class="involved-grid">
+    <div>
+      <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.3px;font-weight:600;display:block;margin-bottom:4px">Full name *</label>
+      <input type="text" placeholder="e.g. Adriana López" value="${esc(p.name||'')}" oninput="updateInvolved(${i},'name',this.value)">
+    </div>
+    <div>
+      <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.3px;font-weight:600;display:block;margin-bottom:4px">Job title / Position</label>
+      <input type="text" placeholder="e.g. Line Supervisor" value="${esc(p.role||'')}" oninput="updateInvolved(${i},'role',this.value)">
+    </div>
+  </div>
+  <div style="margin-bottom:8px">
+    <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.3px;font-weight:600;display:block;margin-bottom:4px">Level of involvement</label>
+    <select onchange="updateInvolved(${i},'level',this.value)" style="padding:7px 10px;font-size:13px;width:100%;border:1px solid #e5e4e0;border-radius:8px;background:#fff;color:#1a1a18;font-family:inherit">
+      <option value="">Select level</option>
+      ${INVOLVEMENT_LEVELS.map(l=>`<option value="${l}" ${p.level===l?'selected':''}>${l}</option>`).join('')}
+    </select>
+  </div>
+  <div>
+    <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.3px;font-weight:600;display:block;margin-bottom:4px">Description of involvement / Actions taken</label>
+    <textarea placeholder="Describe what this person did, their role in the incident, any actions or decisions they made..." oninput="updateInvolved(${i},'description',this.value)">${esc(p.description||'')}</textarea>
+  </div>
+</div>`;
+}
+
+function addInvolvedRow() {
+  involvedPeople.push({name:'',role:'',level:'',description:''});
+  refreshInvolvedEditor();
+}
+function removeInvolvedRow(i) {
+  involvedPeople.splice(i,1);
+  refreshInvolvedEditor();
+}
+function updateInvolved(i,field,val) {
+  if(involvedPeople[i]) involvedPeople[i][field]=val;
+}
+function refreshInvolvedEditor() {
+  const el=document.getElementById('involved-list');
+  if(el) el.outerHTML=`<div class="involved-list" id="involved-list">${involvedPeople.map((p,i)=>renderInvolvedRow(p,i)).join('')}</div>`;
+  // re-render full editor area
+  const wrap=document.getElementById('involved-editor');
+  if(wrap) wrap.innerHTML=renderInvolvedEditor(involvedPeople);
+}
+
 function renderForm() {
+  involvedPeople = [];
   return `
 <div class="card">
   <div style="font-size:15px;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
     Report New Incident
   </div>
+
   <div class="form-group">
     <label>Incident title *</label>
     <input id="f-title" type="text" placeholder="Brief description of what happened">
@@ -297,16 +378,28 @@ function renderForm() {
     <label>Full description *</label>
     <textarea id="f-desc" placeholder="Describe what happened, where, any immediate actions taken, witnesses, etc."></textarea>
   </div>
+
+  <hr class="divider">
+  <div class="form-group">
+    <label style="margin-bottom:.75rem">
+      👥 People involved
+      <span style="font-weight:400;color:#aaa;text-transform:none;letter-spacing:0;font-size:12px"> — optional</span>
+    </label>
+    <div id="involved-editor">${renderInvolvedEditor(involvedPeople)}</div>
+  </div>
+
+  <hr class="divider">
   <div class="form-group">
     <label>Photos <span style="font-weight:400;color:#aaa;text-transform:none;letter-spacing:0">(optional — max 5)</span></label>
     <div class="photo-upload-zone" id="upload-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-      <input type="file" accept="image/*" multiple onchange="handleFileSelect(event)" id="file-input">
+      <input type="file" accept="image/*" multiple onchange="handleFileSelect(event)">
       <div class="upload-icon">📷</div>
       <p><strong>Click to add photos</strong> or drag and drop here</p>
-      <p style="margin-top:4px;font-size:12px">JPG, PNG, WEBP · Max 5MB each</p>
+      <p style="margin-top:2px;font-size:12px">JPG, PNG, WEBP · Max 5MB each</p>
     </div>
     <div class="photo-previews" id="photo-previews"></div>
   </div>
+
   <div class="form-actions">
     <button class="btn" onclick="showTab('list')">Cancel</button>
     <button class="btn btn-primary" id="submit-btn" onclick="submitForm()">
@@ -317,107 +410,114 @@ function renderForm() {
 </div>`;
 }
 
+// Photo handlers
 function handleDragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('dragover');}
 function handleDragLeave(e){document.getElementById('upload-zone').classList.remove('dragover');}
-function handleDrop(e){
-  e.preventDefault();
-  document.getElementById('upload-zone').classList.remove('dragover');
-  addFiles(Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')));
-}
+function handleDrop(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('dragover');addFiles(Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')));}
 function handleFileSelect(e){addFiles(Array.from(e.target.files));}
-
-function addFiles(files) {
-  const remaining = 5 - pendingFiles.length;
-  if (remaining <= 0) { showToast('Maximum 5 photos allowed.'); return; }
-  const toAdd = files.slice(0, remaining);
-  if (files.length > remaining) showToast(`Only ${remaining} more photo${remaining>1?'s':''} can be added (max 5).`);
-  toAdd.forEach(f => {
-    if (f.size > 5*1024*1024) { showToast(`${f.name} is too large (max 5MB).`); return; }
-    pendingFiles.push(f);
-  });
+function addFiles(files){
+  const remaining=5-pendingFiles.length;
+  if(remaining<=0){showToast('Maximum 5 photos allowed.');return;}
+  files.slice(0,remaining).forEach(f=>{if(f.size>5*1024*1024){showToast(`${f.name} is too large (max 5MB).`);return;}pendingFiles.push(f);});
   renderPreviews();
 }
-
-function renderPreviews() {
-  const wrap = document.getElementById('photo-previews');
-  if (!wrap) return;
-  wrap.innerHTML = pendingFiles.map((f,i) => {
-    const url = URL.createObjectURL(f);
-    return `<div class="photo-preview-wrap"><img src="${url}" alt="preview"><button class="remove-photo" onclick="removePhoto(${i})" type="button">✕</button></div>`;
-  }).join('');
+function renderPreviews(){
+  const wrap=document.getElementById('photo-previews');
+  if(!wrap)return;
+  wrap.innerHTML=pendingFiles.map((f,i)=>`<div class="photo-preview-wrap"><img src="${URL.createObjectURL(f)}" alt="preview"><button class="remove-photo" onclick="removePhoto(${i})" type="button">✕</button></div>`).join('');
 }
+function removePhoto(i){pendingFiles.splice(i,1);renderPreviews();}
 
-function removePhoto(i) {
-  pendingFiles.splice(i, 1);
-  renderPreviews();
+function handleDragOver2(e){e.preventDefault();document.getElementById('upload-zone-detail').classList.add('dragover');}
+function handleDragLeave2(e){document.getElementById('upload-zone-detail').classList.remove('dragover');}
+function handleDrop2(e){e.preventDefault();document.getElementById('upload-zone-detail').classList.remove('dragover');addFiles2(Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')));}
+function handleFileSelect2(e){addFiles2(Array.from(e.target.files));}
+function addFiles2(files){
+  const remaining=5-pendingFiles.length;
+  if(remaining<=0){showToast('Maximum 5 photos allowed.');return;}
+  files.slice(0,remaining).forEach(f=>{if(f.size>5*1024*1024){showToast(`${f.name} is too large.`);return;}pendingFiles.push(f);});
+  renderPreviews2();
 }
+function renderPreviews2(){
+  const wrap=document.getElementById('photo-previews-detail');
+  if(!wrap)return;
+  wrap.innerHTML=pendingFiles.map((f,i)=>`<div class="photo-preview-wrap"><img src="${URL.createObjectURL(f)}" alt="preview"><button class="remove-photo" onclick="removePhoto2(${i})" type="button">✕</button></div>`).join('');
+}
+function removePhoto2(i){pendingFiles.splice(i,1);renderPreviews2();}
 
-async function uploadPhotos(incidentId) {
-  const urls = [];
-  for (let i = 0; i < pendingFiles.length; i++) {
-    const file = pendingFiles[i];
-    const ext = file.name.split('.').pop();
-    const path = `${incidentId}/${Date.now()}_${i}.${ext}`;
-    const { error } = await sb.storage.from(BUCKET).upload(path, file, { contentType: file.type });
-    if (error) { showToast(`Error uploading photo: ${error.message}`); continue; }
-    const { data } = sb.storage.from(BUCKET).getPublicUrl(path);
+async function uploadPhotos(incidentId){
+  const urls=[];
+  for(let i=0;i<pendingFiles.length;i++){
+    const file=pendingFiles[i];
+    const ext=file.name.split('.').pop();
+    const path=`${incidentId}/${Date.now()}_${i}.${ext}`;
+    const {error}=await sb.storage.from(BUCKET).upload(path,file,{contentType:file.type});
+    if(error){showToast(`Error uploading photo: ${error.message}`);continue;}
+    const {data}=sb.storage.from(BUCKET).getPublicUrl(path);
     urls.push(data.publicUrl);
   }
   return urls;
 }
 
-async function submitForm() {
-  const title = document.getElementById('f-title').value.trim();
-  const type = document.getElementById('f-type').value;
-  const dept = document.getElementById('f-dept').value;
-  const sev = document.getElementById('f-sev').value;
-  const reporter = document.getElementById('f-reporter').value.trim();
-  const desc = document.getElementById('f-desc').value.trim();
+async function submitForm(){
+  const title=document.getElementById('f-title').value.trim();
+  const type=document.getElementById('f-type').value;
+  const dept=document.getElementById('f-dept').value;
+  const sev=document.getElementById('f-sev').value;
+  const reporter=document.getElementById('f-reporter').value.trim();
+  const desc=document.getElementById('f-desc').value.trim();
 
-  document.getElementById('err-title').textContent = '';
-  if (!title){document.getElementById('err-title').textContent='Title is required';return;}
-  if (!type||!dept||!sev||!reporter||!desc){showToast('Please fill in all required fields.');return;}
+  document.getElementById('err-title').textContent='';
+  if(!title){document.getElementById('err-title').textContent='Title is required';return;}
+  if(!type||!dept||!sev||!reporter||!desc){showToast('Please fill in all required fields.');return;}
 
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Submitting...';
+  // validate involved: anyone added must have at least a name
+  const validInvolved=involvedPeople.filter(p=>p.name.trim());
 
-  const { data, error } = await sb.from('incidents').insert([{
-    title, type, department:dept, severity:sev,
-    reported_by:reporter, description:desc,
-    status:'Open', corrective_action:'', photos:[]
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Submitting...';
+
+  const {data,error}=await sb.from('incidents').insert([{
+    title,type,department:dept,severity:sev,
+    reported_by:reporter,description:desc,
+    status:'Open',corrective_action:'',
+    photos:[],involved:validInvolved
   }]).select().single();
 
-  if (error){showToast('Error: '+error.message);btn.disabled=false;btn.innerHTML='Submit Incident';return;}
+  if(error){showToast('Error: '+error.message);btn.disabled=false;btn.innerHTML='Submit Incident';return;}
 
-  let photoUrls = [];
-  if (pendingFiles.length > 0) {
-    btn.innerHTML = '<span class="spinner"></span>Uploading photos...';
-    photoUrls = await uploadPhotos(data.id);
-    if (photoUrls.length > 0) {
-      await sb.from('incidents').update({photos: photoUrls}).eq('id', data.id);
-      data.photos = photoUrls;
+  let photoUrls=[];
+  if(pendingFiles.length>0){
+    btn.innerHTML='<span class="spinner"></span>Uploading photos...';
+    photoUrls=await uploadPhotos(data.id);
+    if(photoUrls.length>0){
+      await sb.from('incidents').update({photos:photoUrls}).eq('id',data.id);
+      data.photos=photoUrls;
     }
   }
 
   db.unshift(data);
-  pendingFiles = [];
+  pendingFiles=[];involvedPeople=[];
   showToast('Incident reported successfully.');
   openDetail(data.id);
 }
 
-function openDetail(id) {
-  currentTab = 'detail';
-  editingId = id;
+function openDetail(id){
+  currentTab='detail';editingId=id;pendingFiles=[];
   ['dash','list','new'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.remove('active');});
+  // load involved into editor state
+  const inc=db.find(i=>i.id===id);
+  involvedPeople=inc?.involved?JSON.parse(JSON.stringify(inc.involved)):[];
   render();
 }
 
-function renderDetail() {
-  const inc = db.find(i=>i.id===editingId);
-  if (!inc) return '<div class="empty">Incident not found.</div>';
-  const resTime = inc.resolved_at ? Math.round((new Date(inc.resolved_at)-new Date(inc.created_at))/86400000*10)/10 : null;
-  const photos = inc.photos || [];
+function renderDetail(){
+  const inc=db.find(i=>i.id===editingId);
+  if(!inc)return'<div class="empty">Incident not found.</div>';
+  const resTime=inc.resolved_at?Math.round((new Date(inc.resolved_at)-new Date(inc.created_at))/86400000*10)/10:null;
+  const photos=inc.photos||[];
+  const involved=inc.involved||[];
+
   return `
 <div style="margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
   <button class="btn" onclick="showTab('list')" style="font-size:12px;padding:5px 12px">← Back to list</button>
@@ -450,6 +550,20 @@ function renderDetail() {
     <div class="field-value" style="background:#f0fdf4;border-radius:8px;padding:.75rem 1rem;line-height:1.7;font-size:14px;border-left:3px solid #1a6b3c">${esc(inc.corrective_action)}</div>
   </div>`:''}
 
+  ${involved.length>0?`
+  <div class="detail-field" style="margin-bottom:1.25rem">
+    <div class="field-label" style="margin-bottom:.6rem">👥 People involved (${involved.length})</div>
+    ${involved.map(p=>`
+    <div class="involved-detail-card">
+      <div class="name-role">
+        <span class="iname">${esc(p.name)}</span>
+        ${p.role?`<span class="irole">· ${esc(p.role)}</span>`:''}
+        ${p.level?`<span class="ilevel ilevel-${p.level}">${p.level}</span>`:''}
+      </div>
+      ${p.description?`<div class="idesc">${esc(p.description)}</div>`:''}
+    </div>`).join('')}
+  </div>`:''}
+
   ${photos.length>0?`
   <div class="detail-field" style="margin-bottom:1.25rem">
     <div class="field-label">Photos (${photos.length})</div>
@@ -460,13 +574,14 @@ function renderDetail() {
 
   <hr class="divider">
   <div style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:#888;margin-bottom:1rem">Update Incident</div>
+
   <div class="form-grid" style="margin-bottom:1rem">
     <div class="form-group" style="margin-bottom:0">
       <label>Status</label>
       <select id="u-status">${STATUSES.map(s=>`<option value="${s}" ${inc.status===s?'selected':''}>${s}</option>`).join('')}</select>
     </div>
     <div style="display:flex;align-items:flex-end;padding-bottom:.5rem">
-      <p style="font-size:12px;color:#aaa;line-height:1.6">Setting to <strong style="color:#444">Resolved</strong> records the resolution date and updates avg. resolution time.</p>
+      <p style="font-size:12px;color:#aaa;line-height:1.6">Setting to <strong style="color:#444">Resolved</strong> records the resolution date automatically.</p>
     </div>
   </div>
   <div class="form-group">
@@ -474,6 +589,13 @@ function renderDetail() {
     <textarea id="u-action" placeholder="Describe corrective actions taken or planned...">${esc(inc.corrective_action||'')}</textarea>
   </div>
 
+  <hr class="divider">
+  <div class="form-group">
+    <label style="margin-bottom:.75rem">👥 Edit people involved</label>
+    <div id="involved-editor">${renderInvolvedEditor(involvedPeople)}</div>
+  </div>
+
+  <hr class="divider">
   <div class="form-group">
     <label>Add more photos <span style="font-weight:400;color:#aaa;text-transform:none;letter-spacing:0">(optional)</span></label>
     <div class="photo-upload-zone" id="upload-zone-detail" ondragover="handleDragOver2(event)" ondragleave="handleDragLeave2(event)" ondrop="handleDrop2(event)">
@@ -495,76 +617,52 @@ function renderDetail() {
 </div>`;
 }
 
-function handleDragOver2(e){e.preventDefault();document.getElementById('upload-zone-detail').classList.add('dragover');}
-function handleDragLeave2(e){document.getElementById('upload-zone-detail').classList.remove('dragover');}
-function handleDrop2(e){e.preventDefault();document.getElementById('upload-zone-detail').classList.remove('dragover');addFiles2(Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')));}
-function handleFileSelect2(e){addFiles2(Array.from(e.target.files));}
-function addFiles2(files){
-  const remaining = 5 - pendingFiles.length;
-  if(remaining<=0){showToast('Maximum 5 photos allowed.');return;}
-  files.slice(0,remaining).forEach(f=>{
-    if(f.size>5*1024*1024){showToast(`${f.name} is too large (max 5MB).`);return;}
-    pendingFiles.push(f);
-  });
-  renderPreviews2();
-}
-function renderPreviews2(){
-  const wrap=document.getElementById('photo-previews-detail');
-  if(!wrap)return;
-  wrap.innerHTML=pendingFiles.map((f,i)=>{
-    const url=URL.createObjectURL(f);
-    return `<div class="photo-preview-wrap"><img src="${url}" alt="preview"><button class="remove-photo" onclick="removePhoto2(${i})" type="button">✕</button></div>`;
-  }).join('');
-}
-function removePhoto2(i){pendingFiles.splice(i,1);renderPreviews2();}
+async function updateIncident(){
+  const inc=db.find(i=>i.id===editingId);
+  if(!inc)return;
+  const newStatus=document.getElementById('u-status').value;
+  const action=document.getElementById('u-action').value;
+  const wasResolved=inc.status==='Resolved';
+  const nowResolved=newStatus==='Resolved';
+  const validInvolved=involvedPeople.filter(p=>p.name.trim());
 
-async function updateIncident() {
-  const inc = db.find(i=>i.id===editingId);
-  if (!inc) return;
-  const newStatus = document.getElementById('u-status').value;
-  const action = document.getElementById('u-action').value;
-  const wasResolved = inc.status==='Resolved';
-  const nowResolved = newStatus==='Resolved';
+  const btn=document.getElementById('save-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Saving...';
 
-  const btn = document.getElementById('save-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Saving...';
-
-  let newPhotos = inc.photos || [];
-  if (pendingFiles.length > 0) {
-    btn.innerHTML = '<span class="spinner"></span>Uploading photos...';
-    const uploaded = await uploadPhotos(inc.id);
-    newPhotos = [...newPhotos, ...uploaded];
+  let newPhotos=inc.photos||[];
+  if(pendingFiles.length>0){
+    btn.innerHTML='<span class="spinner"></span>Uploading photos...';
+    const uploaded=await uploadPhotos(inc.id);
+    newPhotos=[...newPhotos,...uploaded];
   }
 
-  const updates = {
-    status: newStatus,
-    corrective_action: action,
-    photos: newPhotos,
-    resolved_at: nowResolved&&!wasResolved ? new Date().toISOString() : (!nowResolved?null:inc.resolved_at)
+  const updates={
+    status:newStatus,corrective_action:action,
+    photos:newPhotos,involved:validInvolved,
+    resolved_at:nowResolved&&!wasResolved?new Date().toISOString():(!nowResolved?null:inc.resolved_at)
   };
 
-  const { error } = await sb.from('incidents').update(updates).eq('id', editingId);
-  btn.disabled = false;
-  if (error){showToast('Error: '+error.message);return;}
-  Object.assign(inc, updates);
-  pendingFiles = [];
+  const {error}=await sb.from('incidents').update(updates).eq('id',editingId);
+  btn.disabled=false;
+  if(error){showToast('Error: '+error.message);return;}
+  Object.assign(inc,updates);
+  pendingFiles=[];
   showToast('Incident updated successfully.');
   render();
 }
 
-async function deleteIncident(id) {
-  if (!confirm('Delete this incident? This cannot be undone.')) return;
-  const inc = db.find(i=>i.id===id);
-  if (inc?.photos?.length) {
-    for (const url of inc.photos) {
-      const path = url.split('/'+BUCKET+'/')[1];
-      if (path) await sb.storage.from(BUCKET).remove([path]);
+async function deleteIncident(id){
+  if(!confirm('Delete this incident? This cannot be undone.'))return;
+  const inc=db.find(i=>i.id===id);
+  if(inc?.photos?.length){
+    for(const url of inc.photos){
+      const path=url.split('/'+BUCKET+'/')[1];
+      if(path)await sb.storage.from(BUCKET).remove([path]);
     }
   }
-  const { error } = await sb.from('incidents').delete().eq('id', id);
-  if (error){showToast('Error: '+error.message);return;}
-  db = db.filter(i=>i.id!==id);
+  const {error}=await sb.from('incidents').delete().eq('id',id);
+  if(error){showToast('Error: '+error.message);return;}
+  db=db.filter(i=>i.id!==id);
   showToast('Incident deleted.');
   showTab('list');
 }
