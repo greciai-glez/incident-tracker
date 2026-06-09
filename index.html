@@ -24,13 +24,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-primary:hover{background:#333}
 .btn-danger{background:#fff;color:#c0392b;border-color:#f5c6c6}
 .btn-danger:hover{background:#fff5f5}
-.btn-sm{padding:5px 10px;font-size:12px}
 .card{background:#fff;border:1px solid #e5e4e0;border-radius:12px;padding:1.25rem}
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.25rem}
 .metric{background:#fff;border:1px solid #e5e4e0;border-radius:10px;padding:1rem;text-align:center}
-.metric .val{font-size:28px;font-weight:600;line-height:1.1;letter-spacing:-1px}
+.metric .val{font-size:24px;font-weight:600;line-height:1.1;letter-spacing:-1px}
 .metric .lbl{font-size:11px;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
-.metric .val.red{color:#c0392b}.metric .val.amber{color:#b8640a}.metric .val.green{color:#1a6b3c}.metric .val.blue{color:#1a5fa5}
+.metric .val.red{color:#c0392b}.metric .val.amber{color:#b8640a}.metric .val.green{color:#1a6b3c}.metric .val.blue{color:#1a5fa5}.metric .val.purple{color:#6d28d9}
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem}
 .chart-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:.75rem}
 .bar-item{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:13px}
@@ -51,6 +50,7 @@ form input,form select,form textarea{width:100%;padding:9px 12px;font-size:14px;
 form input:focus,form select:focus,form textarea:focus{outline:none;border-color:#1a1a18}
 form textarea{resize:vertical;min-height:80px;line-height:1.5}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
 .form-group{margin-bottom:1rem}
 .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:.5rem;padding-top:1rem;border-top:1px solid #f0efe8}
 .detail-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;gap:1rem;flex-wrap:wrap}
@@ -68,6 +68,7 @@ form textarea{resize:vertical;min-height:80px;line-height:1.5}
 .err{color:#c0392b;font-size:12px;margin-top:4px}
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
 .section-header h2{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px}
+.cost-badge{background:#f5f3ff;color:#5b21b6;font-size:12px;padding:2px 8px;border-radius:5px;font-weight:600}
 
 /* Photo upload */
 .photo-upload-zone{border:2px dashed #e5e4e0;border-radius:10px;padding:1.25rem;text-align:center;cursor:pointer;transition:all .15s;background:#fafaf8;position:relative}
@@ -96,8 +97,6 @@ form textarea{resize:vertical;min-height:80px;line-height:1.5}
 .involved-card textarea{font-size:13px;min-height:60px;padding:7px 10px}
 .add-involved-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;font-size:13px;border:1px dashed #c0bfba;border-radius:8px;background:transparent;color:#888;cursor:pointer;transition:all .15s;width:100%;justify-content:center}
 .add-involved-btn:hover{border-color:#1a1a18;color:#1a1a18;background:#f5f4f0}
-
-/* Involved detail view */
 .involved-detail-card{background:#f9f8f5;border:1px solid #e5e4e0;border-radius:10px;padding:.9rem 1rem;margin-bottom:8px}
 .involved-detail-card .name-role{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
 .involved-detail-card .iname{font-size:14px;font-weight:600}
@@ -109,7 +108,9 @@ form textarea{resize:vertical;min-height:80px;line-height:1.5}
 .ilevel-Supervisor{background:#f5f3ff;color:#5b21b6}
 .involved-detail-card .idesc{font-size:13px;color:#555;line-height:1.6;margin-top:4px}
 
-@media(max-width:620px){.form-grid{grid-template-columns:1fr}.chart-row{grid-template-columns:1fr}.inc-badges{display:none}.topbar-left .sub{display:none}.involved-grid{grid-template-columns:1fr}}
+/* Cost input row */
+
+@media(max-width:620px){.form-grid{grid-template-columns:1fr}.form-grid-3{grid-template-columns:1fr}.chart-row{grid-template-columns:1fr}.inc-badges{display:none}.topbar-left .sub{display:none}.involved-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -152,23 +153,19 @@ const DEPTS = ['Warehouse','Production','Shipping','QA','Maintenance','Office'];
 const SEVERITIES = ['Low','Medium','High','Critical'];
 const STATUSES = ['Open','In Progress','Resolved'];
 const INVOLVEMENT_LEVELS = ['Direct','Indirect','Witness','Supervisor'];
+
 const TYPE_COLORS = ['#e24b4a','#ef9f27','#378add','#1d9e75','#7f77dd','#888780'];
 const DEPT_COLORS = ['#1d9e75','#378add','#ef9f27','#7f77dd','#d85a30','#888780'];
 
-let db = [];
-let currentTab = 'dash';
-let editingId = null;
+let db = [], currentTab = 'dash', editingId = null;
 let filters = {status:'',type:'',department:'',severity:''};
-let toastTimer = null;
-let pendingFiles = [];
-let involvedPeople = []; // [{name, role, level, description}]
+let toastTimer = null, pendingFiles = [], involvedPeople = [];
 
 async function loadData() {
   const { data, error } = await sb.from('incidents').select('*').order('created_at', { ascending: false });
   if (error) { showToast('Error loading data: ' + error.message); return; }
   db = data || [];
 }
-
 async function init() { await loadData(); showTab('dash'); }
 
 function showTab(tab) {
@@ -176,7 +173,6 @@ function showTab(tab) {
   ['dash','list','new'].forEach(t => { const el=document.getElementById('tab-'+t); if(el) el.classList.toggle('active',t===tab); });
   render();
 }
-
 function render() {
   const el = document.getElementById('content');
   if (currentTab==='dash') el.innerHTML = renderDash();
@@ -195,12 +191,26 @@ function sevBadge(s) {
   const c=m[s]||['#f5f4f0','#444'];
   return `<span class="badge" style="background:${c[0]};color:${c[1]}">${s}</span>`;
 }
+function fmtCost(cost) {
+  if (cost == null || cost === '') return null;
+  return '$' + Number(cost).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' USD';
+}
 
 function avgResolutionDays() {
   const resolved=db.filter(i=>i.resolved_at);
   if(!resolved.length)return null;
-  const avg=resolved.reduce((a,i)=>a+(new Date(i.resolved_at)-new Date(i.created_at)),0)/resolved.length;
-  return Math.round(avg/86400000*10)/10;
+  return Math.round(resolved.reduce((a,i)=>a+(new Date(i.resolved_at)-new Date(i.created_at)),0)/resolved.length/86400000*10)/10;
+}
+function totalCost() {
+  const withCost = db.filter(i=>i.cost!=null&&i.cost!=='');
+  if (!withCost.length) return null;
+  // group by currency, return most common or USD total
+  const usd = withCost.filter(i=>!i.currency||i.currency==='USD');
+  const mxn = withCost.filter(i=>i.currency==='MXN');
+  // show whichever has more entries
+  const main = usd.length >= mxn.length ? usd : mxn;
+  const curr = usd.length >= mxn.length ? 'USD' : 'MXN';
+  return fmtCost(db.filter(i=>i.cost!=null&&i.cost!=='').reduce((a,i)=>a+Number(i.cost),0));
 }
 
 function renderDash() {
@@ -209,6 +219,7 @@ function renderDash() {
   const resolved=db.filter(i=>i.status==='Resolved').length;
   const critical=db.filter(i=>i.severity==='Critical'&&i.status!=='Resolved').length;
   const avg=avgResolutionDays();
+  const tc=totalCost();
   const byType=TYPES.map((t,i)=>({name:t,count:db.filter(x=>x.type===t).length,color:TYPE_COLORS[i]})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
   const byDept=DEPTS.map((d,i)=>({name:d,count:db.filter(x=>x.department===d).length,color:DEPT_COLORS[i]})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
   const maxType=byType[0]?.count||1, maxDept=byDept[0]?.count||1;
@@ -220,6 +231,7 @@ function renderDash() {
   <div class="metric"><div class="val green">${resolved}</div><div class="lbl">Resolved</div></div>
   <div class="metric"><div class="val ${critical>0?'red':'green'}">${critical}</div><div class="lbl">Critical Open</div></div>
   <div class="metric"><div class="val blue">${avg!==null?avg+'d':'—'}</div><div class="lbl">Avg Resolution</div></div>
+  <div class="metric"><div class="val purple" style="font-size:18px">${tc||'—'}</div><div class="lbl">Total Cost</div></div>
 </div>
 <div class="chart-row">
   <div class="card">
@@ -242,8 +254,9 @@ function renderDash() {
       <div class="inc-title">${esc(i.title)}</div>
       <div class="inc-meta">
         <span>${i.department}</span><span>${i.type}</span><span>${fmtDate(i.created_at)}</span><span>by ${esc(i.reported_by)}</span>
-        ${i.involved&&i.involved.length?`<span>👥 ${i.involved.length} involved</span>`:''}
-        ${i.photos&&i.photos.length?`<span>📷 ${i.photos.length} photo${i.photos.length>1?'s':''}</span>`:''}
+        ${i.cost!=null&&i.cost!==''?`<span>💰 ${fmtCost(i.cost)}</span>`:''}
+        ${i.involved&&i.involved.length?`<span>👥 ${i.involved.length}</span>`:''}
+        ${i.photos&&i.photos.length?`<span>📷 ${i.photos.length}</span>`:''}
       </div>
     </div>
     <div class="inc-badges">${statusBadge(i.status)}${sevBadge(i.severity)}</div>
@@ -269,8 +282,9 @@ ${sorted.length?sorted.map(i=>`
     <div class="inc-title">${esc(i.title)}</div>
     <div class="inc-meta">
       <span>${i.department}</span><span>${i.type}</span><span>by ${esc(i.reported_by)}</span><span>${fmtDate(i.created_at)}</span>
+      ${i.cost!=null&&i.cost!==''?`<span>💰 ${fmtCost(i.cost)}</span>`:''}
       ${i.involved&&i.involved.length?`<span>👥 ${i.involved.length} involved</span>`:''}
-      ${i.photos&&i.photos.length?`<span>📷 ${i.photos.length} photo${i.photos.length>1?'s':''}</span>`:''}
+      ${i.photos&&i.photos.length?`<span>📷 ${i.photos.length}</span>`:''}
     </div>
   </div>
   <div class="inc-badges">${statusBadge(i.status)}${sevBadge(i.severity)}</div>
@@ -283,108 +297,56 @@ function getFiltered(){
   return db.filter(i=>(!filters.status||i.status===filters.status)&&(!filters.type||i.type===filters.type)&&(!filters.department||i.department===filters.department)&&(!filters.severity||i.severity===filters.severity));
 }
 
-// ── Involved people helpers ──────────────────────────────
+// Involved helpers
 function renderInvolvedEditor(people) {
-  return `
-<div class="involved-list" id="involved-list">
-  ${people.map((p,i)=>renderInvolvedRow(p,i)).join('')}
-</div>
+  return `<div class="involved-list" id="involved-list">${people.map((p,i)=>renderInvolvedRow(p,i)).join('')}</div>
 <button type="button" class="add-involved-btn" onclick="addInvolvedRow()">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   Add person
 </button>`;
 }
-
-function renderInvolvedRow(p, i) {
-  return `
-<div class="involved-card" id="inv-card-${i}">
+function renderInvolvedRow(p,i){
+  return `<div class="involved-card" id="inv-card-${i}">
   <button type="button" class="remove-involved" onclick="removeInvolvedRow(${i})">✕</button>
   <div class="involved-grid">
-    <div>
-      <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.3px;font-weight:600;display:block;margin-bottom:4px">Full name *</label>
-      <input type="text" placeholder="e.g. Adriana López" value="${esc(p.name||'')}" oninput="updateInvolved(${i},'name',this.value)">
-    </div>
-    <div>
-      <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.3px;font-weight:600;display:block;margin-bottom:4px">Job title / Position</label>
-      <input type="text" placeholder="e.g. Line Supervisor" value="${esc(p.role||'')}" oninput="updateInvolved(${i},'role',this.value)">
-    </div>
+    <div><label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.3px;font-weight:600;display:block;margin-bottom:4px">Full name *</label><input type="text" placeholder="e.g. Adriana López" value="${esc(p.name||'')}" oninput="updateInvolved(${i},'name',this.value)"></div>
+    <div><label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.3px;font-weight:600;display:block;margin-bottom:4px">Job title / Position</label><input type="text" placeholder="e.g. Line Supervisor" value="${esc(p.role||'')}" oninput="updateInvolved(${i},'role',this.value)"></div>
   </div>
-  <div style="margin-bottom:8px">
-    <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.3px;font-weight:600;display:block;margin-bottom:4px">Level of involvement</label>
-    <select onchange="updateInvolved(${i},'level',this.value)" style="padding:7px 10px;font-size:13px;width:100%;border:1px solid #e5e4e0;border-radius:8px;background:#fff;color:#1a1a18;font-family:inherit">
-      <option value="">Select level</option>
-      ${INVOLVEMENT_LEVELS.map(l=>`<option value="${l}" ${p.level===l?'selected':''}>${l}</option>`).join('')}
-    </select>
-  </div>
-  <div>
-    <label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.3px;font-weight:600;display:block;margin-bottom:4px">Description of involvement / Actions taken</label>
-    <textarea placeholder="Describe what this person did, their role in the incident, any actions or decisions they made..." oninput="updateInvolved(${i},'description',this.value)">${esc(p.description||'')}</textarea>
-  </div>
+  <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.3px;font-weight:600;display:block;margin-bottom:4px">Level of involvement</label>
+  <select onchange="updateInvolved(${i},'level',this.value)" style="padding:7px 10px;font-size:13px;width:100%;border:1px solid #e5e4e0;border-radius:8px;background:#fff;color:#1a1a18;font-family:inherit"><option value="">Select level</option>${INVOLVEMENT_LEVELS.map(l=>`<option value="${l}" ${p.level===l?'selected':''}>${l}</option>`).join('')}</select></div>
+  <div><label style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.3px;font-weight:600;display:block;margin-bottom:4px">Description of involvement</label><textarea placeholder="Describe what this person did, their role in the incident..." oninput="updateInvolved(${i},'description',this.value)">${esc(p.description||'')}</textarea></div>
 </div>`;
 }
+function addInvolvedRow(){involvedPeople.push({name:'',role:'',level:'',description:''});refreshInvolvedEditor();}
+function removeInvolvedRow(i){involvedPeople.splice(i,1);refreshInvolvedEditor();}
+function updateInvolved(i,field,val){if(involvedPeople[i])involvedPeople[i][field]=val;}
+function refreshInvolvedEditor(){const wrap=document.getElementById('involved-editor');if(wrap)wrap.innerHTML=renderInvolvedEditor(involvedPeople);}
 
-function addInvolvedRow() {
-  involvedPeople.push({name:'',role:'',level:'',description:''});
-  refreshInvolvedEditor();
-}
-function removeInvolvedRow(i) {
-  involvedPeople.splice(i,1);
-  refreshInvolvedEditor();
-}
-function updateInvolved(i,field,val) {
-  if(involvedPeople[i]) involvedPeople[i][field]=val;
-}
-function refreshInvolvedEditor() {
-  const el=document.getElementById('involved-list');
-  if(el) el.outerHTML=`<div class="involved-list" id="involved-list">${involvedPeople.map((p,i)=>renderInvolvedRow(p,i)).join('')}</div>`;
-  // re-render full editor area
-  const wrap=document.getElementById('involved-editor');
-  if(wrap) wrap.innerHTML=renderInvolvedEditor(involvedPeople);
-}
-
-function renderForm() {
-  involvedPeople = [];
-  return `
-<div class="card">
+function renderForm(){
+  involvedPeople=[];
+  return `<div class="card">
   <div style="font-size:15px;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
     Report New Incident
   </div>
+  <div class="form-group"><label>Incident title *</label><input id="f-title" type="text" placeholder="Brief description of what happened"><div class="err" id="err-title"></div></div>
+  <div class="form-grid">
+    <div class="form-group"><label>Incident type *</label><select id="f-type"><option value="">Select type</option>${TYPES.map(t=>`<option>${t}</option>`).join('')}</select></div>
+    <div class="form-group"><label>Department *</label><select id="f-dept"><option value="">Select department</option>${DEPTS.map(d=>`<option>${d}</option>`).join('')}</select></div>
+    <div class="form-group"><label>Severity *</label><select id="f-sev"><option value="">Select severity</option>${SEVERITIES.map(s=>`<option>${s}</option>`).join('')}</select></div>
+    <div class="form-group"><label>Reported by *</label><input id="f-reporter" type="text" placeholder="Your full name"></div>
+  </div>
+  <div class="form-group"><label>Full description *</label><textarea id="f-desc" placeholder="Describe what happened, where, any immediate actions taken, witnesses, etc."></textarea></div>
 
   <div class="form-group">
-    <label>Incident title *</label>
-    <input id="f-title" type="text" placeholder="Brief description of what happened">
-    <div class="err" id="err-title"></div>
-  </div>
-  <div class="form-grid">
-    <div class="form-group">
-      <label>Incident type *</label>
-      <select id="f-type"><option value="">Select type</option>${TYPES.map(t=>`<option>${t}</option>`).join('')}</select>
-    </div>
-    <div class="form-group">
-      <label>Department *</label>
-      <select id="f-dept"><option value="">Select department</option>${DEPTS.map(d=>`<option>${d}</option>`).join('')}</select>
-    </div>
-    <div class="form-group">
-      <label>Severity *</label>
-      <select id="f-sev"><option value="">Select severity</option>${SEVERITIES.map(s=>`<option>${s}</option>`).join('')}</select>
-    </div>
-    <div class="form-group">
-      <label>Reported by *</label>
-      <input id="f-reporter" type="text" placeholder="Your full name">
-    </div>
-  </div>
-  <div class="form-group">
-    <label>Full description *</label>
-    <textarea id="f-desc" placeholder="Describe what happened, where, any immediate actions taken, witnesses, etc."></textarea>
+    <label>Estimated cost (USD) <span style="font-weight:400;color:#aaa;text-transform:none;letter-spacing:0">(optional)</span></label>
+    <input id="f-cost" type="number" min="0" step="0.01" placeholder="e.g. 1500.00">
+    <div style="font-size:12px;color:#aaa;margin-top:5px">Enter the estimated cost — repairs, lost production, medical, etc.</div>
   </div>
 
   <hr class="divider">
   <div class="form-group">
-    <label style="margin-bottom:.75rem">
-      👥 People involved
-      <span style="font-weight:400;color:#aaa;text-transform:none;letter-spacing:0;font-size:12px"> — optional</span>
-    </label>
+    <label style="margin-bottom:.75rem">👥 People involved <span style="font-weight:400;color:#aaa;text-transform:none;letter-spacing:0;font-size:12px">— optional</span></label>
     <div id="involved-editor">${renderInvolvedEditor(involvedPeople)}</div>
   </div>
 
@@ -415,44 +377,22 @@ function handleDragOver(e){e.preventDefault();document.getElementById('upload-zo
 function handleDragLeave(e){document.getElementById('upload-zone').classList.remove('dragover');}
 function handleDrop(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('dragover');addFiles(Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')));}
 function handleFileSelect(e){addFiles(Array.from(e.target.files));}
-function addFiles(files){
-  const remaining=5-pendingFiles.length;
-  if(remaining<=0){showToast('Maximum 5 photos allowed.');return;}
-  files.slice(0,remaining).forEach(f=>{if(f.size>5*1024*1024){showToast(`${f.name} is too large (max 5MB).`);return;}pendingFiles.push(f);});
-  renderPreviews();
-}
-function renderPreviews(){
-  const wrap=document.getElementById('photo-previews');
-  if(!wrap)return;
-  wrap.innerHTML=pendingFiles.map((f,i)=>`<div class="photo-preview-wrap"><img src="${URL.createObjectURL(f)}" alt="preview"><button class="remove-photo" onclick="removePhoto(${i})" type="button">✕</button></div>`).join('');
-}
+function addFiles(files){const r=5-pendingFiles.length;if(r<=0){showToast('Max 5 photos.');return;}files.slice(0,r).forEach(f=>{if(f.size>5*1024*1024){showToast(`${f.name} too large.`);return;}pendingFiles.push(f);});renderPreviews();}
+function renderPreviews(){const w=document.getElementById('photo-previews');if(!w)return;w.innerHTML=pendingFiles.map((f,i)=>`<div class="photo-preview-wrap"><img src="${URL.createObjectURL(f)}"><button class="remove-photo" onclick="removePhoto(${i})" type="button">✕</button></div>`).join('');}
 function removePhoto(i){pendingFiles.splice(i,1);renderPreviews();}
-
 function handleDragOver2(e){e.preventDefault();document.getElementById('upload-zone-detail').classList.add('dragover');}
 function handleDragLeave2(e){document.getElementById('upload-zone-detail').classList.remove('dragover');}
 function handleDrop2(e){e.preventDefault();document.getElementById('upload-zone-detail').classList.remove('dragover');addFiles2(Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')));}
 function handleFileSelect2(e){addFiles2(Array.from(e.target.files));}
-function addFiles2(files){
-  const remaining=5-pendingFiles.length;
-  if(remaining<=0){showToast('Maximum 5 photos allowed.');return;}
-  files.slice(0,remaining).forEach(f=>{if(f.size>5*1024*1024){showToast(`${f.name} is too large.`);return;}pendingFiles.push(f);});
-  renderPreviews2();
-}
-function renderPreviews2(){
-  const wrap=document.getElementById('photo-previews-detail');
-  if(!wrap)return;
-  wrap.innerHTML=pendingFiles.map((f,i)=>`<div class="photo-preview-wrap"><img src="${URL.createObjectURL(f)}" alt="preview"><button class="remove-photo" onclick="removePhoto2(${i})" type="button">✕</button></div>`).join('');
-}
+function addFiles2(files){const r=5-pendingFiles.length;if(r<=0){showToast('Max 5 photos.');return;}files.slice(0,r).forEach(f=>{if(f.size>5*1024*1024){showToast(`${f.name} too large.`);return;}pendingFiles.push(f);});renderPreviews2();}
+function renderPreviews2(){const w=document.getElementById('photo-previews-detail');if(!w)return;w.innerHTML=pendingFiles.map((f,i)=>`<div class="photo-preview-wrap"><img src="${URL.createObjectURL(f)}"><button class="remove-photo" onclick="removePhoto2(${i})" type="button">✕</button></div>`).join('');}
 function removePhoto2(i){pendingFiles.splice(i,1);renderPreviews2();}
-
 async function uploadPhotos(incidentId){
   const urls=[];
   for(let i=0;i<pendingFiles.length;i++){
-    const file=pendingFiles[i];
-    const ext=file.name.split('.').pop();
-    const path=`${incidentId}/${Date.now()}_${i}.${ext}`;
+    const file=pendingFiles[i],ext=file.name.split('.').pop(),path=`${incidentId}/${Date.now()}_${i}.${ext}`;
     const {error}=await sb.storage.from(BUCKET).upload(path,file,{contentType:file.type});
-    if(error){showToast(`Error uploading photo: ${error.message}`);continue;}
+    if(error){showToast(`Error uploading: ${error.message}`);continue;}
     const {data}=sb.storage.from(BUCKET).getPublicUrl(path);
     urls.push(data.publicUrl);
   }
@@ -466,38 +406,28 @@ async function submitForm(){
   const sev=document.getElementById('f-sev').value;
   const reporter=document.getElementById('f-reporter').value.trim();
   const desc=document.getElementById('f-desc').value.trim();
+  const costVal=document.getElementById('f-cost').value;
 
   document.getElementById('err-title').textContent='';
   if(!title){document.getElementById('err-title').textContent='Title is required';return;}
   if(!type||!dept||!sev||!reporter||!desc){showToast('Please fill in all required fields.');return;}
 
-  // validate involved: anyone added must have at least a name
   const validInvolved=involvedPeople.filter(p=>p.name.trim());
-
   const btn=document.getElementById('submit-btn');
   btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Submitting...';
 
-  const {data,error}=await sb.from('incidents').insert([{
-    title,type,department:dept,severity:sev,
-    reported_by:reporter,description:desc,
-    status:'Open',corrective_action:'',
-    photos:[],involved:validInvolved
-  }]).select().single();
+  const payload={title,type,department:dept,severity:sev,reported_by:reporter,description:desc,status:'Open',corrective_action:'',photos:[],involved:validInvolved,
+    cost:costVal!==''&&costVal!=null?Number(costVal):null};
 
+  const {data,error}=await sb.from('incidents').insert([payload]).select().single();
   if(error){showToast('Error: '+error.message);btn.disabled=false;btn.innerHTML='Submit Incident';return;}
 
-  let photoUrls=[];
   if(pendingFiles.length>0){
     btn.innerHTML='<span class="spinner"></span>Uploading photos...';
-    photoUrls=await uploadPhotos(data.id);
-    if(photoUrls.length>0){
-      await sb.from('incidents').update({photos:photoUrls}).eq('id',data.id);
-      data.photos=photoUrls;
-    }
+    const urls=await uploadPhotos(data.id);
+    if(urls.length>0){await sb.from('incidents').update({photos:urls}).eq('id',data.id);data.photos=urls;}
   }
-
-  db.unshift(data);
-  pendingFiles=[];involvedPeople=[];
+  db.unshift(data);pendingFiles=[];involvedPeople=[];
   showToast('Incident reported successfully.');
   openDetail(data.id);
 }
@@ -505,7 +435,6 @@ async function submitForm(){
 function openDetail(id){
   currentTab='detail';editingId=id;pendingFiles=[];
   ['dash','list','new'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.remove('active');});
-  // load involved into editor state
   const inc=db.find(i=>i.id===id);
   involvedPeople=inc?.involved?JSON.parse(JSON.stringify(inc.involved)):[];
   render();
@@ -517,6 +446,7 @@ function renderDetail(){
   const resTime=inc.resolved_at?Math.round((new Date(inc.resolved_at)-new Date(inc.created_at))/86400000*10)/10:null;
   const photos=inc.photos||[];
   const involved=inc.involved||[];
+  const costStr=fmtCost(inc.cost);
 
   return `
 <div style="margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
@@ -527,7 +457,10 @@ function renderDetail(){
   <div class="detail-header">
     <div style="flex:1">
       <div style="font-size:17px;font-weight:600;margin-bottom:8px;line-height:1.3">${esc(inc.title)}</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">${statusBadge(inc.status)}${sevBadge(inc.severity)}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${statusBadge(inc.status)}${sevBadge(inc.severity)}
+        ${costStr?`<span class="cost-badge">💰 ${costStr}</span>`:''}
+      </div>
     </div>
     <div style="font-size:12px;color:#aaa;text-align:right;flex-shrink:0">
       <div>Reported ${fmtDate(inc.created_at)}</div>
@@ -544,49 +477,26 @@ function renderDetail(){
     <div class="field-label">Description</div>
     <div class="field-value" style="background:#f9f8f5;border-radius:8px;padding:.75rem 1rem;line-height:1.7;font-size:14px">${esc(inc.description)}</div>
   </div>
-  ${inc.corrective_action?`
-  <div class="detail-field" style="margin-bottom:1.25rem">
-    <div class="field-label">Corrective action taken</div>
-    <div class="field-value" style="background:#f0fdf4;border-radius:8px;padding:.75rem 1rem;line-height:1.7;font-size:14px;border-left:3px solid #1a6b3c">${esc(inc.corrective_action)}</div>
-  </div>`:''}
-
-  ${involved.length>0?`
-  <div class="detail-field" style="margin-bottom:1.25rem">
-    <div class="field-label" style="margin-bottom:.6rem">👥 People involved (${involved.length})</div>
-    ${involved.map(p=>`
-    <div class="involved-detail-card">
-      <div class="name-role">
-        <span class="iname">${esc(p.name)}</span>
-        ${p.role?`<span class="irole">· ${esc(p.role)}</span>`:''}
-        ${p.level?`<span class="ilevel ilevel-${p.level}">${p.level}</span>`:''}
-      </div>
-      ${p.description?`<div class="idesc">${esc(p.description)}</div>`:''}
-    </div>`).join('')}
-  </div>`:''}
-
-  ${photos.length>0?`
-  <div class="detail-field" style="margin-bottom:1.25rem">
-    <div class="field-label">Photos (${photos.length})</div>
-    <div class="photo-gallery">
-      ${photos.map(url=>`<a href="${url}" target="_blank" rel="noopener"><img src="${url}" alt="Incident photo" loading="lazy"></a>`).join('')}
-    </div>
-  </div>`:''}
+  ${inc.corrective_action?`<div class="detail-field" style="margin-bottom:1.25rem"><div class="field-label">Corrective action taken</div><div class="field-value" style="background:#f0fdf4;border-radius:8px;padding:.75rem 1rem;line-height:1.7;font-size:14px;border-left:3px solid #1a6b3c">${esc(inc.corrective_action)}</div></div>`:''}
+  ${involved.length>0?`<div class="detail-field" style="margin-bottom:1.25rem"><div class="field-label" style="margin-bottom:.6rem">👥 People involved (${involved.length})</div>${involved.map(p=>`<div class="involved-detail-card"><div class="name-role"><span class="iname">${esc(p.name)}</span>${p.role?`<span class="irole">· ${esc(p.role)}</span>`:''} ${p.level?`<span class="ilevel ilevel-${p.level}">${p.level}</span>`:''}</div>${p.description?`<div class="idesc">${esc(p.description)}</div>`:''}</div>`).join('')}</div>`:''}
+  ${photos.length>0?`<div class="detail-field" style="margin-bottom:1.25rem"><div class="field-label">Photos (${photos.length})</div><div class="photo-gallery">${photos.map(url=>`<a href="${url}" target="_blank" rel="noopener"><img src="${url}" alt="photo" loading="lazy"></a>`).join('')}</div></div>`:''}
 
   <hr class="divider">
   <div style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:#888;margin-bottom:1rem">Update Incident</div>
-
   <div class="form-grid" style="margin-bottom:1rem">
     <div class="form-group" style="margin-bottom:0">
       <label>Status</label>
       <select id="u-status">${STATUSES.map(s=>`<option value="${s}" ${inc.status===s?'selected':''}>${s}</option>`).join('')}</select>
     </div>
-    <div style="display:flex;align-items:flex-end;padding-bottom:.5rem">
-      <p style="font-size:12px;color:#aaa;line-height:1.6">Setting to <strong style="color:#444">Resolved</strong> records the resolution date automatically.</p>
-    </div>
+    <div style="display:flex;align-items:flex-end;padding-bottom:.5rem"><p style="font-size:12px;color:#aaa;line-height:1.6">Setting to <strong style="color:#444">Resolved</strong> records the resolution date automatically.</p></div>
   </div>
   <div class="form-group">
     <label>Corrective action</label>
     <textarea id="u-action" placeholder="Describe corrective actions taken or planned...">${esc(inc.corrective_action||'')}</textarea>
+  </div>
+  <div class="form-group">
+    <label>Incident cost (USD) <span style="font-weight:400;color:#aaa;text-transform:none;letter-spacing:0">(optional)</span></label>
+    <input id="u-cost" type="number" min="0" step="0.01" placeholder="e.g. 1500.00" value="${inc.cost!=null?inc.cost:''}">
   </div>
 
   <hr class="divider">
@@ -618,12 +528,11 @@ function renderDetail(){
 }
 
 async function updateIncident(){
-  const inc=db.find(i=>i.id===editingId);
-  if(!inc)return;
+  const inc=db.find(i=>i.id===editingId);if(!inc)return;
   const newStatus=document.getElementById('u-status').value;
   const action=document.getElementById('u-action').value;
-  const wasResolved=inc.status==='Resolved';
-  const nowResolved=newStatus==='Resolved';
+  const costVal=document.getElementById('u-cost').value;
+  const wasResolved=inc.status==='Resolved',nowResolved=newStatus==='Resolved';
   const validInvolved=involvedPeople.filter(p=>p.name.trim());
 
   const btn=document.getElementById('save-btn');
@@ -637,34 +546,25 @@ async function updateIncident(){
   }
 
   const updates={
-    status:newStatus,corrective_action:action,
-    photos:newPhotos,involved:validInvolved,
+    status:newStatus,corrective_action:action,photos:newPhotos,involved:validInvolved,
+    cost:costVal!==''&&costVal!=null?Number(costVal):null,
     resolved_at:nowResolved&&!wasResolved?new Date().toISOString():(!nowResolved?null:inc.resolved_at)
   };
 
   const {error}=await sb.from('incidents').update(updates).eq('id',editingId);
   btn.disabled=false;
   if(error){showToast('Error: '+error.message);return;}
-  Object.assign(inc,updates);
-  pendingFiles=[];
-  showToast('Incident updated successfully.');
-  render();
+  Object.assign(inc,updates);pendingFiles=[];
+  showToast('Incident updated successfully.');render();
 }
 
 async function deleteIncident(id){
   if(!confirm('Delete this incident? This cannot be undone.'))return;
   const inc=db.find(i=>i.id===id);
-  if(inc?.photos?.length){
-    for(const url of inc.photos){
-      const path=url.split('/'+BUCKET+'/')[1];
-      if(path)await sb.storage.from(BUCKET).remove([path]);
-    }
-  }
+  if(inc?.photos?.length){for(const url of inc.photos){const path=url.split('/'+BUCKET+'/')[1];if(path)await sb.storage.from(BUCKET).remove([path]);}}
   const {error}=await sb.from('incidents').delete().eq('id',id);
   if(error){showToast('Error: '+error.message);return;}
-  db=db.filter(i=>i.id!==id);
-  showToast('Incident deleted.');
-  showTab('list');
+  db=db.filter(i=>i.id!==id);showToast('Incident deleted.');showTab('list');
 }
 
 function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
